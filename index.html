@@ -1,90 +1,467 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="zh">
 <head>
-<meta  http-equiv="content-type" content="text/html;charset=utf-8">
-<meta name="keywords" content="">
-<meta name="description" content="">
-
-<link type="text/css" href="css/style.css" rel="stylesheet" />
-
-<title>七夕，高陌</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1000天倒计时</title>
+    <style>
+        :root {
+            --primary-color: #e74c3c;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --text-color: #2c3e50;
+            --light-text: #7f8c8d;
+            --background: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            text-align: center;
+            background-color: var(--background);
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--secondary-color);
+            border-radius: 3px;
+        }
+        
+        .countdown {
+            font-size: 2.5rem;
+            margin: 2rem 0;
+            color: var(--text-color);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .progress-section {
+            margin: 2.5rem 0;
+        }
+        
+        h3 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .hundred-days {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem auto;
+            flex-wrap: wrap;
+            max-width: 600px;
+            gap: 10px;
+        }
+        
+        .hundred-day {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--secondary-color);
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            position: relative;
+            background-color: rgba(52, 152, 219, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .hundred-day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(52, 152, 219, 0.2);
+        }
+        
+        .hundred-day.checked {
+            background-color: rgba(39, 174, 96, 0.1);
+            border-color: var(--success-color);
+        }
+        
+        .hundred-day.checked::after {
+            content: "✓";
+            color: var(--success-color);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        
+        .hundred-day-label {
+            position: absolute;
+            top: -22px;
+            font-size: 0.7rem;
+            color: var(--light-text);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .grid-container {
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: rgba(236, 240, 241, 0.5);
+            border-radius: 15px;
+            max-width: 600px;
+        }
+        
+        .day-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0 auto;
+            gap: 4px;
+        }
+        
+        .day-cell {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.5s ease;
+            border-radius: 3px;
+            background-color: white;
+        }
+        
+        .day-cell.filled {
+            background-color: var(--primary-color);
+            border-color: #c0392b;
+            transform: scale(1.1);
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: rgba(236, 240, 241, 0.5);
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--light-text);
+            margin-top: 5px;
+        }
+        
+        .instructions {
+            margin-top: 1.5rem;
+            color: var(--light-text);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: var(--border-color);
+            border-radius: 5px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .countdown {
+                font-size: 1.8rem;
+            }
+            
+            .hundred-day {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .day-cell {
+                width: 12px;
+                height: 12px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="screen">
-	<div class="landscape"></div>
-	<div class="filter"></div>
-	<canvas id="canvas"></canvas>
-	<div class="send">
-		<div class="input clearfix">
-		<input type="text" class="text">
-		<div class="btn">发送弹幕</div>
-		</div>
-	</div>
-	<div class="time">
-		<span id="t_d">00天</span>
-		<span id="t_h">00时</span>
-		<span id="t_m">00分</span>
-		<span id="t_s">00秒</span>
-		<span id="z_f">00次</span>
+    <div class="container">
+        <h1>1000天倒计时</h1>
+        
+        <div class="countdown" id="countdown">1000天 00:00:00</div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="daysLeft">1000</div>
+                <div class="stat-label">剩余天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="daysPassed">0</div>
+                <div class="stat-label">已过天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="percentage">0%</div>
+                <div class="stat-label">完成进度</div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3>100天里程碑</h3>
+            <div class="hundred-days" id="hundredDays">
+                <!-- 100天进度方块将通过JS动态生成 -->
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h3>每日进度</h3>
+            <div class="grid-container">
+                <div class="day-grid" id="dayGrid">
+                    <!-- 每日格子将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <p>每过一个100天，上方会有一个方块打勾 ✓</p>
+            <p>每过一天，下方方格中会有一个格子变为红色</p>
+            <p>总进度条和统计数据会实时更新</p>
+        </div>
     </div>
-	<div class="s_show">
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">我好想你</div>
-		<div class="magictime twisterInUp">我真的好想你````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">不要放弃我</div>
-		<div class="magictime twisterInUp">我会陪你到最后的````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">可以一起出去玩吗？</div>
-		<div class="magictime twisterInUp">别怕，我会陪着你的````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">我好累</div>
-		<div class="magictime twisterInUp">我会坚持下去的````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">扶我起来，这串代码还没写完</div>
-		<div class="magictime twisterInUp">和我在你起好吗？````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">我会在这里等你</div>
-		<div class="magictime twisterInUp">陪着你的````</div>
-		<div class="magictime twisterInUp">陌陌</div>
-		<div class="magictime twisterInUp">加油</div>
-		<div class="magictime twisterInUp">我们会在一起的````</div>
-	</div>
-</div>
-			
-<script type="text/javascript" src="js/star.js"></script>
-<script type="text/javascript" src="js/dan.js"></script>
-	
-<script>
-  function GetRTime(){
-    var beginTime= new Date('2020/04/22 18:49:00');
-    var NowTime = new Date();
 
-    var t =NowTime.getTime() - beginTime.getTime();
-    var d=0;
-    var h=0;
-    var m=0;
-    var s=0;
-	var c=0;
-    if(t>=0){
-      d=Math.floor(t/1000/60/60/24);
-      h=Math.floor(t/1000/60/60%24);
-      m=Math.floor(t/1000/60%60);
-      s=Math.floor(t/1000%60);
-	  c=Math.floor(t/1000/60/60);
-    }
-  
-  
-    document.getElementById("t_d").innerHTML = d + "天";
-    document.getElementById("t_h").innerHTML = h + "时";
-    document.getElementById("t_m").innerHTML = m + "分";
-    document.getElementById("t_s").innerHTML = s + "秒";
-	document.getElementById("z_f").innerHTML = c + "次";
-  }
-  setInterval(GetRTime,0);
-</script>
-
+    <script>
+        // 使用requestAnimationFrame优化动画性能
+        let lastUpdate = 0;
+        const updateInterval = 1000; // 1秒更新一次
+        
+        // 设置目标日期（当前日期 + 1000天）
+        const startDate = new Date();
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1000);
+        
+        // 缓存DOM元素
+        const countdownEl = document.getElementById('countdown');
+        const hundredDaysContainer = document.getElementById('hundredDays');
+        const dayGrid = document.getElementById('dayGrid');
+        const progressFill = document.getElementById('progressFill');
+        const daysLeftEl = document.getElementById('daysLeft');
+        const daysPassedEl = document.getElementById('daysPassed');
+        const percentageEl = document.getElementById('percentage');
+        
+        // 初始化100天进度方块
+        function initHundredDays() {
+            hundredDaysContainer.innerHTML = '';
+            
+            for (let i = 0; i < 10; i++) {
+                const hundredDay = document.createElement('div');
+                hundredDay.className = 'hundred-day';
+                hundredDay.dataset.range = `${i * 100 + 1}-${(i + 1) * 100}`;
+                
+                const label = document.createElement('span');
+                label.className = 'hundred-day-label';
+                label.textContent = `${i * 100 + 1}-${(i + 1) * 100}`;
+                
+                hundredDay.appendChild(label);
+                hundredDaysContainer.appendChild(hundredDay);
+                
+                // 添加工具提示效果
+                hundredDay.addEventListener('mouseover', function() {
+                    if (!this.classList.contains('checked')) return;
+                    
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = `已完成 ${this.dataset.range} 天`;
+                    document.body.appendChild(tooltip);
+                    
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.left = `${rect.left + rect.width/2 - tooltip.offsetWidth/2}px`;
+                    tooltip.style.top = `${rect.top - 40}px`;
+                    
+                    this._tooltip = tooltip;
+                });
+                
+                hundredDay.addEventListener('mouseout', function() {
+                    if (this._tooltip) {
+                        document.body.removeChild(this._tooltip);
+                        delete this._tooltip;
+                    }
+                });
+            }
+        }
+        
+        // 创建方格排列
+        function createDayGrid() {
+            dayGrid.innerHTML = '';
+            
+            // 创建1000个格子，每行50个，共20行
+            const cellsPerRow = 50;
+            const totalRows = 20;
+            
+            for (let i = 0; i < 1000; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'day-cell';
+                cell.title = `第 ${i + 1} 天`;
+                dayGrid.appendChild(cell);
+                
+                // 每50个格子后添加一个换行标记（实际由flex-wrap处理）
+                if ((i + 1) % cellsPerRow === 0) {
+                    dayGrid.appendChild(document.createElement('div'));
+                }
+            }
+        }
+        
+        // 更新倒计时
+        function updateCountdown(timestamp) {
+            if (!lastUpdate || timestamp - lastUpdate >= updateInterval) {
+                lastUpdate = timestamp;
+                
+                const now = new Date();
+                const diff = endDate - now;
+                
+                if (diff <= 0) {
+                    countdownEl.textContent = "倒计时结束！";
+                    return;
+                }
+                
+                // 计算剩余时间
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // 更新倒计时显示
+                countdownEl.textContent = 
+                    `${days}天 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 计算已过去的天数
+                const elapsedDays = 1000 - days;
+                
+                // 更新统计数据
+                updateStats(days, elapsedDays);
+                
+                // 更新100天进度
+                updateHundredDaysProgress(elapsedDays);
+                
+                // 更新每日格子
+                updateDayCells(elapsedDays);
+            }
+            
+            requestAnimationFrame(updateCountdown);
+        }
+        
+        // 更新统计数据
+        function updateStats(daysLeft, daysPassed) {
+            daysLeftEl.textContent = daysLeft;
+            daysPassedEl.textContent = daysPassed;
+            
+            const percentage = ((daysPassed / 1000) * 100).toFixed(1);
+            percentageEl.textContent = `${percentage}%`;
+            
+            // 更新进度条
+            progressFill.style.width = `${percentage}%`;
+        }
+        
+        // 更新100天进度
+        function updateHundredDaysProgress(elapsedDays) {
+            const hundredDays = document.querySelectorAll('.hundred-day');
+            const completedHundreds = Math.floor(elapsedDays / 100);
+            
+            hundredDays.forEach((day, index) => {
+                if (index < completedHundreds) {
+                    day.classList.add('checked');
+                } else {
+                    day.classList.remove('checked');
+                }
+            });
+        }
+        
+        // 更新每日格子
+        function updateDayCells(elapsedDays) {
+            const dayCells = document.querySelectorAll('.day-cell');
+            
+            dayCells.forEach((cell, index) => {
+                if (index < elapsedDays) {
+                    cell.classList.add('filled');
+                } else {
+                    cell.classList.remove('filled');
+                }
+            });
+        }
+        
+        // 初始化应用
+        function initApp() {
+            initHundredDays();
+            createDayGrid();
+            requestAnimationFrame(updateCountdown);
+        }
+        
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
 </body>
 </html>
